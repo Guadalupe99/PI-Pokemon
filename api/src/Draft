@@ -1,0 +1,493 @@
+                       //Modelos
+
+//Pokemon
+
+const { DataTypes } = require("sequelize");
+// Exportamos una funcion que define el modelo
+// Luego le injectamos la conexion a sequelize.
+module.exports = (sequelize) => {
+  // defino el modelo
+  sequelize.define(
+    "pokemon",
+    {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      hp: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      image: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      attack: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      defense: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      speed: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      height: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      weight: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      createdInDB: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+    },
+    { timestamps: false }
+  );
+}
+
+
+//Type
+
+const { DataTypes } = require("sequelize");
+
+module.exports = (sequelize) => {
+  sequelize.define(
+    "type",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    { timestamps: false }
+  );
+};
+
+
+                        //CONTROLADORES
+
+//getAll
+
+const { Pokemon, Type } = require("../db");
+const { API_URL } = process.env;
+const axios = require("axios");
+
+const getAPIPokemons = async () => {
+  //Traigo de la API
+  const getPokemonDetails = (url) => {
+    // Obtengo los detalles de un pokemon
+    return axios
+      .get(url)
+      .then((response) => response.data)
+      .catch((error) => console.log(error));
+  };
+
+  //Obtengo la lista de URLs de todos los pokemon
+  const response = await axios.get(`${API_URL}?limit=250`);
+  const urls = response.data.results.map((pokemon) => pokemon.url);
+
+  //Obtengo los detalles de todos los pokemon
+  const pokemonDetails = await Promise.all(
+    urls.map((url) => getPokemonDetails(url))
+  );
+
+  //Convertimos el array de detalles
+  const pokemonsAPI = pokemonDetails.map((pokemon) => {
+    return {
+      id: pokemon.id,
+      name: pokemon.name,
+      image: pokemon.sprites.other.home.front_default,
+      hp: pokemon.stats[0].base_stat,
+      attack: pokemon.stats[1].base_stat,
+      defense: pokemon.stats[2].base_stat,
+      speed: pokemon.stats[5].base_stat,
+      height: pokemon.height,
+      weight: pokemon.weight,
+      types: pokemon.types.map((type) => type.type.name),
+    };
+  });
+  return pokemonsAPI;
+};
+
+const getDBPokemons = async () => {
+  //Busco en la base de datos
+  const pokemonsDB = await Pokemon.findAll({
+    include: {
+      model: Type,
+      attributes: ["name"],
+      through: {
+        attributes: [],
+      },
+    },
+  });
+
+  const pokemonsDbMap = pokemonsDB.map((pokemon) => ({
+    ...pokemon.toJSON(),
+    types: pokemon.types.map((type) => type.name),
+  }));
+
+  return pokemonsDbMap;
+};
+
+const getAllPokemons = async () => {
+  const pokemonsAPI = await getAPIPokemons();
+  const pokemonsDB = await getDBPokemons();
+
+  //Guardo ambas respuestas en un array
+  const allPokemons = [...pokemonsDB, ...pokemonsAPI];
+
+  return allPokemons;
+};
+
+module.exports = getAllPokemons;
+
+
+
+//getById
+
+require("dotenv").config();
+const axios = require("axios");
+//const { API_URL } = process.env;
+const { formatear, formatearTypes } = require("../Helpers/Helpers");
+const { Pokemon, Type } = require("../db");
+
+const getPokemonById = async (id) => {
+  //Si el id es un número traemos la data con axios y le damos el formato de objeto deseado
+  if (!isNaN(id)) {
+    const response = await axios.get(`${API_URL}/${id}`);
+    return formatear(response.data);
+  } else {
+    //Sino es un número lo buscamos en la DB por Primary Key
+    const responseDB = await Pokemon.findByPk(id, {
+      include: {
+        model: Type,
+        attributes: ["name"],
+        through: {
+          attributes: [],
+        },
+      },
+    });
+
+    //Creamos una copia del objeto pokemon, lo convertimos en objeto plano y retornamos un array con el pokemon obtenido de la DB con sus tipos asociados
+    if (responseDB) {
+      return formatearTypes(responseDB);
+    }
+
+    return "No se encontro el pokemon";
+  }
+};
+
+module.exports = getPokemonById;
+
+
+
+
+
+
+
+
+
+//getByName
+
+
+require("dotenv").config();
+const axios = require("axios");
+//const { API_URL } = process.env;
+const { formatear, formatearTypes } = require("../Helpers/Helpers");
+const { Pokemon, Type } = require("../db");
+
+const getName = async (name) => {
+  //Buscamos el nombre del pokemon en la DB, si lo encontramos creamos una copia del objeto pokemon, lo convertimos en objeto plano y retornamos un array con el pokemon obtenido de la DB con sus tipos asociados
+  const responseDB = await Pokemon.findOne({
+    where: {
+      name,
+    },
+    include: {
+      model: Type,
+      attributes: ["name"],
+      through: {
+        attributes: [],
+      },
+    },
+  });
+  if (responseDB) {
+    return formatearTypes(responseDB);
+  }
+  //Si no es encontrado en la DB, se busca en la api y se le da el formato de objeto deseado
+  const response = await axios.get(`${API_URL}/${name}`);
+
+  return formatear(response.data);
+};
+
+module.exports = getName;
+
+
+
+
+
+// getTypes
+
+
+const axios = require("axios");
+const { Type } = require("../db");
+const { API_TYPE } = process.env;
+
+const getTypes = async () => {
+  // Hacemos la solicitud a la api
+  const response = await axios.get(API_TYPE);
+  // Asignamos el array de tipos a la vairbale
+  const typesAPI = response.data.results;
+
+  // Iteramos sobre cada tipo y si no existe en la DB lo creamos
+  typesAPI.forEach((type) => {
+    Type.findOrCreate({
+      where: {
+        name: type.name,
+      },
+    });
+  });
+
+  return "typesCreated";
+};
+
+module.exports = getTypes;
+
+
+
+
+// post
+
+const { Pokemon } = require("../db");
+
+const postPokemon = async (
+  name,
+  image,
+  hp,
+  attack,
+  defense,
+  speed,
+  height,
+  weight,
+  types
+) => {
+  // Si no están todos los parametros requeridos -> error
+  if (
+    !name ||
+    !image ||
+    !hp ||
+    !attack ||
+    !defense ||
+    !speed ||
+    !height ||
+    !weight ||
+    !types
+  )
+    throw new Error("There is not all the required information");
+
+  //Consultamos a la DB si ya existe un pokemon con el mismo nombre, si existe -> error
+  const existPokemon = await Pokemon.findOne({
+    where: { name: name },
+  });
+
+  if (existPokemon)
+    throw new Error(
+      "The name of this pokemon already exists, please try another name"
+    );
+
+  // Sino lo creamos
+  const newPokemon = await Pokemon.create({
+    name,
+    image,
+    hp,
+    attack,
+    defense,
+    speed,
+    height,
+    weight,
+  });
+
+  //Asociamos los tipos proporcionados al nuevo pokemon
+  await newPokemon.addTypes(types);
+
+  return newPokemon;
+};
+
+module.exports = postPokemon;
+
+
+
+
+
+
+// Helpers
+
+const formatear = (pokemon) => {
+  return {
+    id: pokemon.id,
+    name: pokemon.name,
+    image: pokemon.sprites.other.home.front_default,
+    hp: pokemon.stats[0].base_stat,
+    attack: pokemon.stats[1].base_stat,
+    defense: pokemon.stats[2].base_stat,
+    speed: pokemon.stats[5].base_stat,
+    height: pokemon.height,
+    weight: pokemon.weight,
+    types: pokemon.types.map((type) => type.type.name),
+  };
+};
+
+const formatearTypes = (pokemonDB) => {
+  return {
+    ...pokemonDB.toJSON(),
+    types: pokemonDB.types.map((type) => type.name),
+  };
+};
+
+module.exports = { formatear, formatearTypes };
+
+
+
+
+                                      // RUTAS
+
+
+
+//pokemonRouter
+
+const { Router } = require("express");
+
+const pokeRouter = Router();
+
+const getPokemonById = require("../controllers/getById.controller");
+const getAllPokemons = require("../controllers/getAll.controllers");
+const getPokemonByName = require("../controllers/getByName.controllers");
+const postPokemon = require("../controllers/post.controller");
+
+//PORQUE CAMI LLAMO A LOS CONTROLLERS DE ESA MANERA?? -------------
+
+pokeRouter.get("/", async (req, res) => {
+  const { name } = req.query;
+  try {
+    if (!name) {
+      const response = await getAllPokemons();
+      return res.status(200).json(response);
+    }
+
+    const pokemon = await getPokemonByName(name);
+    return res.status(200).json(pokemon);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+});
+
+pokeRouter.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const pokemon = await getPokemonById(id);
+    return res.status(200).json(pokemon);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
+pokeRouter.post("/", async (req, res) => {
+  const { name, image, hp, attack, defense, speed, height, weight, types } =
+    req.body;
+  try {
+    const newPokemon = await postPokemon(
+      name,
+      image,
+      hp,
+      attack,
+      defense,
+      speed,
+      height,
+      weight,
+      types
+    );
+
+    return res.status(200).json(newPokemon);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+module.exports = pokeRouter;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
