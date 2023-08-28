@@ -1,5 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
+require("dotenv").config();
+const axios = require('axios');
 const { API_URL } = process.env;
 const { formatear, formatearTypes } = require('../Helpers/Helpers');
 const { Pokemon, Type } = require('../db');

@@ -1,3 +1,4 @@
+const axios = require('axios');
 const { Router } = require("express");
 const pokeRouter = require("./pokemonRouter"); //enrutadores modularizados
 const typeRouter = require("./typeRouter"); //enrutadores modularizados
