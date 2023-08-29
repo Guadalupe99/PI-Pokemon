@@ -16,7 +16,7 @@ const getTypes = async () => {
             // findOrCreate -> busca un elemento en una base de datos y, si no se encuentra, lo crea. En esencia, combina las acciones de búsqueda y creación en una sola operación.
             
             where: {
-                nam: type.name,
+                name: type.name,
             },
         });
     });
