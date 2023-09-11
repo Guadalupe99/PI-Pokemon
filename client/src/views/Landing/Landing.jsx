@@ -12,9 +12,9 @@ const Landing = () => {
     return (
         <div className = { styles['landing'] }>
             <img 
-            SRC = { require('../../imagenes/pokemonLanding.jpg').default }
+            src = { require('../../imagenes/pokemonLanding.jpg').default }
             alt = 'imagen de fondo'
-            calssName = { styles['background-image'] } />
+            className = { styles['background-image'] } />
 
             <button className = { styles.buttonLan } onClick = { handleIngresar }>Ingresar</button>
             

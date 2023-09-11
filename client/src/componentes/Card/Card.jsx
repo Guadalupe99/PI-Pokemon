@@ -21,3 +21,7 @@ const Card = ({ pokemon }) => {
 };
 
 export default Card;
+
+// toUpperCase -> se utiliza para convertir una cadena de caracteres a su equivalente en mayúsculas
+
+// join -> para unir los elementos de un arreglo en una sola cadena de caracteres. Permite especificar un separador que se insertará entre cada elemento al unirlos.

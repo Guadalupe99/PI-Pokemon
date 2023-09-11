@@ -8,7 +8,7 @@ const SearchBar = () =>  {
     const [searchQuery, setSearchQuery] = useState('');
     
     const handleSearch = () => {
-        dispatch(getByName(event.target.value));
+        dispatch(getByName(searchQuery));
     };
     
     const handleChange = (event) => {
