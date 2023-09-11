@@ -10,6 +10,9 @@ const initialPokemon = {
     hp: '',
     attack: '',
     defense: '',
+    speed: '',
+    height: '',
+    weight: '',
     image: '',
     types: [],
 };
@@ -31,7 +34,7 @@ const Form = () => {
         });
         setErrors(
             validationForm({ ...create, [event.target.name]: event.target.value})
-        );
+        ); 
     };
 
     useEffect(() => {
@@ -39,13 +42,13 @@ const Form = () => {
     }, [errors]);
 
     const getTypeName = (id) => {
-        const type = type.find((t) => t.id === id);
+        const type = types.find((t) => t.id === id);
         return type ? type.name : '';
     };
 
     const handleChangePokemons = (event) => {
         const typeName = event.target.value;
-        if (create.types.incluedes(typeName)) {
+        if (create.types.includes(typeName)) {
             setCreate({
                 ...create,
                 types: create.types.filter((t) => t !== typeName),
@@ -72,7 +75,7 @@ const Form = () => {
     };
 
     const handleSubmit = async (event) => {
-        event.prevenDefault();
+        event.preventDefault();
         if (!Object.entries(errors).length) {
             const body= {
                 name: create.name,
@@ -80,7 +83,7 @@ const Form = () => {
                 attack: create.attack,
                 defense: create.defense,
                 image: create.image,
-                type: create.types,
+                types: create.types,
             };
             const response = await axios.post(`http://localhost:3001/pokemons`, body);
             if (response.data.message) {
@@ -92,7 +95,7 @@ const Form = () => {
     };
 
     return (
-        <div clasName={styles.formWrapper}>
+        <div className={styles.formWrapper}>
             <div className={ styles.formContainer }>
                 <h2 className={ styles.formTittle }>Create Pokemon</h2>
                 <form onSubmit={ handleSubmit }>
@@ -185,7 +188,7 @@ const Form = () => {
                         onChange={ handleChange }
                         value={ create.image }
                         type='file'
-                        accept='imagen/*' //Limita la selección de archivos a aquellos de tipo imagen.
+                        accept='image/*' //Limita la selección de archivos a aquellos de tipo imagen.
                         name='image'
                         className={ styles.inputField } />
 
