@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import validationForm from './validationForm';
+import validationForm from './validationForm.js';
 import styles from './Form.module.css';
 
 const initialPokemon = {

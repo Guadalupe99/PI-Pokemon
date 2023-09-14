@@ -78,7 +78,7 @@ const reducer = (state= initialState, action) => {
                     ...state,
                     filter: action.payload,
                     pokemons: state.copy.filter((pokemon) => {
-                        return pokemon.type.filter((type) => type === action.payload).length
+                        return pokemon.type && Array.isArray(pokemon.type) && pokemon.type.includes(action.payload);
                     })
                 }
             }

@@ -46,6 +46,8 @@ const validationForm = (create) => {
 
 }
 
+export default validationForm;
+
 // !/^[a-zA-Z\s]+$/ => Se utiliza para verificar si una cadena NO consiste únicamente en letras alfabéticas (mayúsculas o minúsculas)
 // y espacios en blanco. El símbolo de exclamación (!) al principio invierte la lógica de coincidencia de la expresión regular.
 //  En este caso, se busca cualquier cadena que no cumpla con el patrón de contener solo letras alfabéticas y espacios.
