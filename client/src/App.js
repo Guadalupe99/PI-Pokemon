@@ -1,22 +1,23 @@
-import './App.css';
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Landing from './views/Landing/Landing';
-import Home from './views/Home/Home';
-import Form from './views/Form/Form';
-import Detail from './views/Detail/Detail';
-
+import React from "react";
+import { BrowserRouter as Router, Route, useLocation } from "react-router-dom";
+import  Detail from "./views/Detail/Detail";
+import  Landing  from './views/Landing/Landing'
+import  Home  from './views/Home/Home';
+import  Form  from './views/Form/Form';
+//import NavBar from "./components/NavBar/NavBar";
 
 function App() {
+  const location = useLocation();
+
   return (
-    <Router>
-      <Switch>
-        <Route exact path='/' component={Landing} />
-        <Route exact path='/home' component={Home} />
-        <Route exact path='/form' component={Form} />
-        <Route exact path='/detail' component={Detail} />
-      </Switch>
-    </Router>
+    <div className="App">
+      <Router>
+        <Route exact path="/" element={<Landing />} />
+        <Route path="/home" element={<Home />} />
+        <Route exact path="/detail/:id" element={<Detail />} />
+        <Route exact path="/create" element={<Form />} />
+      </Router>
+    </div>
   );
 }
 

@@ -1,12 +1,12 @@
-import { createStore, applyMiddleware } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import index from '../Reducer/index';
+import reducer from '../Reducer/reducer';
+
+const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE_ || compose; //esta linea sirve para conectar nuestra App con la extension REDUX DEVTOOLS DEL NAVEGADOR
 
 const store = createStore(
-    index,
-    composeWithDevTools(applyMiddleware(thunkMiddleware))
+    reducer,
+    composeEnhancer(applyMiddleware(thunkMiddleware))
 );
 
 export default store;
-

@@ -1,15 +1,23 @@
 import React from 'react';
-import styles from './Cards.module.css';
 import Card from '../Card/Card';
+import style from './Cards.module.css';
 
 const Cards = ({ pokemons }) => {
     return (
-        <div className={styles.CardsContainer}>
-            {pokemons?.map((pokemon) => (
-                <Card key={ pokemon.id } pokemon={ pokemon } />
-            ))}
+        <div className={ style.container }>
+            {pokemons.map((pokemon) => {
+                return (
+                    <Card 
+                    name={ pokemon.name }
+                    image={ pokemon.image }
+                    types={ pokemon.types.join(' / ')}
+                    key={ pokemon.id }
+                    id={pokemon.id }
+                    />
+                );
+            })}
         </div>
-    )
+    );
 };
 
 export default Cards;

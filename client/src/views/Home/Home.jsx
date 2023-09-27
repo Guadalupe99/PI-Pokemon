@@ -1,53 +1,76 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllPokemons } from '../../redux/Actions/actions';
-
-import SearchBar from '../../componentes/SearchBar/SearchBar';
 import Cards from '../../componentes/Cards/Cards';
-import Order from '../../componentes/Order/Order';
-import Filter from '../../componentes/Filter/Filter';
-import Pagination from '../../componentes/Pagination/Pagination';
-
-import logo from '../../imagenes/Logo.jpg';
-import { Link } from 'react-router-dom';
-import styles from './Home.module.css';
+import NavBar from '../../componentes/NavBar/NavBar';
+import { Paginacion } from '../../componentes/Paginacion/Paginacion';
+import { useEffect, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
+import { getPokemons, getTypes } from '../../redux/Actions/actions';
+import style from './Home.module.css';
 
 const Home = () => {
     const dispatch = useDispatch();
-    const [currentPage, setCurrentPage] = useState(0);
-    const allPokemons = useSelector((state) => state.pokemons.pokemons); //obtener todos los pokemons
+    //Obtenemos la lista de todos los pokemons
+    const allPokemons = useSelector((state) => state.allPokemons);
+    const pokemons = useSelector((state) => state.pokemons);
 
-    const perPage = 12;
+    // ____ PAGINADO____
 
-    useEffect(() => {
-        dispatch(getAllPokemons());
-    }, [dispatch]);
+    //uso useState para definir los estados locales del componente, tambien estas variables guardan el numero de la pagina actual
+    const [currentPage, setCurrentPage] = useState(1);
+    //Guarda la cantidad de pokemons que quiero mostrar por pagina
+    const [perPage, setPerPage] = useState(12);
 
-    const handlePageChange = (newPage) => {
-        setCurrentPage(newPage);
+    //Cuando llamamos esta funcion con un numero de pagina, se actualiza la cantidad que se muestra por pagina y tambien cambia la pagina
+    const pagination = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        // setPerPage(pageNumber === 1 ? 12 : 12);
     };
 
-    //obtener los pokemons a mostrar en la pagina actual
-    const startIndex = currentPage * perPage;
-    const endIndex = startIndex + perPage;
-    const pokemons = allPokemons.slice(startIndex, endIndex);
+    //Compruebo si la pagina es la primera, si es asi devuelvo el index del ultimo pokemon alli, de lo contratio devuelvo el i del ultimo pokemon de la pagina donde este
+    const indexOfLast =
+    currentPage === 1 ? currentPage * perPage : currentPage * perPage - 1;
+    
+    //Resto para obtener el primer pokemon de la pagina actual
+    const indexOfFirst =  indexOfLast - perPage;
 
-    return (
-        <div className={ styles.container }>
-            <img src={ logo } alt='Logo' className={ styles.logo } />
-            <button className={ styles.button }>
-                <Link to={`/form`} styles={{ textDecoration: 'none' }}>CREATE POKEMON</Link>
-            </button>
-            <SearchBar />
-            <Order setPage={ handlePageChange } />
-            <div>
-                <Pagination onPageChange={ handlePageChange } currentPage={ currentPage } perPage={ perPage } />
+    //Renderizo la lista de pokemons paginada, si tenemos la lista de pokemons completa, la cortamos para obtenes lo que corresponde y sino utilizamos la obtenida anteriormente
+    const currentPokemons = pokemons.length
+    ? pokemons.slice(indexOfFirst, indexOfLast)
+    : allPokemons;
+
+    //____PAGINADO____
+
+    useEffect(() => {
+        dispatch(getPokemons());
+        dispatch(getTypes());
+    }, [dispatch]);
+
+    return ( 
+        <div className={ style.body}>
+            <NavBar setCurrentPage={ setCurrentPage } />
+
+            {!pokemons.length ? (
+                <div className={style.espera}>
+                    <h1>One moment, please</h1>
+                    <img
+                        src="https://media.tenor.com/8wfTNKNK99EAAAAi/snorlax-roll.gif"
+                        alt='Loading' />
             </div>
-            <Filter setPage={ setCurrentPage } />
-            <h1 className={ styles.titulo }>POKEMONS</h1>
-            <Cards className={ styles.cards } pokemons={ pokemons } />
+            ) : (
+                <div>
+                    <Cards pokemons={currentPokemons}/>
+                    <Paginacion
+                    pokemons={pokemons.length}
+                    pagination={pagination}
+                    perPage={perPage}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage} />
+                </div>
+            )}
         </div>
     );
-}
+};
 
 export default Home;
+
+// .slice => se utiliza para extraer una porción de un array (arreglo) y crear un nuevo array que contiene los elementos seleccionados. . Este método no modifica el array original, sino que devuelve un nuevo array con los elementos que cumplen con los criterios especificados.
+//es útil cuando deseas trabajar con una parte específica de un array sin alterar el array original. Puedes especificar un rango de índices para seleccionar los elementos que necesitas en un nuevo array. 

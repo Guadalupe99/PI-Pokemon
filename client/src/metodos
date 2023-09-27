@@ -1,0 +1,13 @@
+// toUpperCase -> se utiliza para convertir una cadena de caracteres a su equivalente en mayúsculas
+
+// join -> para unir los elementos de un arreglo en una sola cadena de caracteres. Permite especificar un separador que se insertará entre cada elemento al unirlos.
+
+// Math.ceil => redondea para arriba...... ceiling (ceil) -> significa techo
+
+//toLowerCase => se utiliza para convertir una cadena de texto en minúsculas
+
+//preventDefault => se utiliza para detener o prevenir el comportamiento predeterminado asociado a un evento en un elemento HTML, lo que te permite controlar y personalizar cómo se maneja ese evento en tu código.
+
+//disabled => se utiliza para indicar que un elemento de formulario o un elemento interactivo no está habilitado o activo... (puedes utilizar la propiedad "disabled" en un botón para deshabilitarlo y evitar que el usuario lo presione hasta que se cumplan ciertas condiciones o se realice alguna acción específica.)
+
+//// .slice => se utiliza para extraer una porción de un array (arreglo) y crear un nuevo array que contiene los elementos seleccionados..... es útil cuando deseas trabajar con una parte específica de un array sin alterar el array original. Puedes especificar un rango de índices para seleccionar los elementos que necesitas en un nuevo array... Este método no modifica el array original, sino que devuelve un nuevo array con los elementos que cumplen con los criterios especificados.

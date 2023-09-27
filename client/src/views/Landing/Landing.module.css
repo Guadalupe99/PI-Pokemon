@@ -1,0 +1,74 @@
+html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    margin-top: 0;
+    background-image: url("https://i.imgur.com/qlgoLVk.png");
+    margin: 0;
+    padding: 0;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    height: 100vh;
+    position: relative;
+    z-index: -1;
+  }
+  
+  .divConFondo {
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  .imagen {
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    top: 40%;
+    left: 63.3%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .logo {
+    max-width: 35%;
+    max-height: 35%;
+  }
+  
+  .link {
+    text-decoration: none;
+    color: black;
+  }
+  
+  .boton {
+    text-decoration: none;
+    position: absolute;
+    top: 49%;
+    left: 50.8%;
+    transform: translate(-50%, -50%);
+    display: inline-block;
+    /* padding: 3px 10px; */
+    height: 60px;
+    width: 60px;
+    background-color: #646161;
+    color: #fff;
+    font-size: 16px;
+    border: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden;
+    transition: 0.8s;
+    font-weight: normal;
+  }
+  
+  .boton:hover {
+    /* background-color: #D0B022; */
+    background-color: #fff;
+    border-radius: 50%;
+  }

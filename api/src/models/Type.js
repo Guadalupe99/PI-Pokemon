@@ -18,3 +18,6 @@ module.exports = (sequelize) => {
         { timestamps: false }
     );
 };
+
+l
+l

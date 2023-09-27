@@ -1,92 +1,71 @@
-import React,{ useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import { getDetails } from '../../redux/Actions/actions';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { cleanDetail, getDetail } from '../../redux/Actions/actions';
 import styles from './Detail.module.css';
 
+
 const Detail = () => {
-    const dispatch = useDispatch();
     const { id } = useParams();
-    const details = useSelector((state) => state.pokemons.details);
-    const error = useSelector((state) => state.pokemons.error);
+    const [loading, setLoading ] = useState(true);
+    const pokemon = useSelector((state) => state.pokemonDetail);
+    const dispatch = useDispatch();
 
+    console.log(pokemon);
     useEffect(() => {
-        dispatch(getDetails(id));
-    }, [dispatch, id]);
-
-    if(error) {
-        return (
-            <div className={styles.errorContainer}>
-                <h1>404 - {error}</h1>
-            </div>
-        );
-    }
-
-    if (!details) {
-        return <div>Loading...</div>;
-    }
-
-    const { name, image, hp, attack, defense, speed, height, weight, type } = details;
+        dispatch(getDetail(id))
+         .then(() => setLoading(false))
+         .catch(() => setLoading(false));
+        return () => dispatch (cleanDetail());
+    }, [id, dispatch]);
 
     return (
-        <div>
-            <img
-              src={ require('../../imagenes/pokemonLanding.jpg').default }
-              alt='Imagen de fondo'
-              className={ styles['background-image']}
-              />
-            
+        <div className={ styles.body }>
+            <Link to='/home' className={ styles.link }>
+                <button className={ styles.boton }>Home</button>
+            </Link>
             <div className={ styles.container }>
-                <h2>{ name }</h2>
+                {loading ? (
+                    <div className={ styles.detail }><h1>Loading</h1></div>
+                ) : !pokemon.id ? (
+                    <div><h1>The pokemon does7 not exist</h1></div>
+                ): (
+                  <div>
+                    <div>
+                        <h1>{pokemon.name}</h1>
+                    </div>
 
-                <img src={ image?.url } alt={ name } />
-
-                <p>
-                    <span className={ styles.bold }>Id:</span> { details.id }
-               </p> 
-
-               <p>
-                    <span className= { styles.bold }>Vida:</span> { hp }
-               </p>
-
-               <p>
-                    <span className={ styles.bold }>Ataque:</span> { attack } 
-               </p>
-
-               <p>
-                    <span className={ styles.bold }>Defensa:</span> { defense }
-               </p>
-                
-                {speed && (
-                    <p> 
-                        <span className={ styles.bold }>Velocidad</span> { speed }  
-                    </p>
+                    <div className={ styles.detail }>
+                        <div className={ styles.containerImg }>
+                            <img src={ pokemon.image } alt={ pokemon.name } />
+                        </div>
+                    
+                    <div>
+                        <p>Id: {pokemon.id}</p>
+                        <p>Health points: {pokemon.hp}</p>
+                        <p>Attack: {pokemon.attack}</p>
+                        <p>Defense: {pokemon.defense}</p>
+                        <p>Speed: {pokemon.speed}</p>
+                        <p>Height: {pokemon.height}</p>
+                        <p>Weight: {pokemon.weight}</p>
+                        <p>
+                            {' '}
+                            Type/s:
+                            {pokemon.types?.map((type) => {
+                                return (
+                                    <ul>
+                                        <li key={pokemon.type}>{type}</li>
+                                    </ul>
+                                );
+                            })}
+                        </p>
+                    </div>
+                  </div>
+                 </div>
                 )}
-                {height && (
-                    <p>
-                        <span className={ styles.bold }>Altura:</span> { height }
-                    </p>
-                )}
-                {weight && (
-                    <p>
-                        <span className={ styles.bold }>Peso:</span> { weight }
-                        
-                    </p>
-                )}
-
-                <p>
-                    <span className={ styles.bold }>Type:</span> {' '}
-                    {type?.join(', ')}
-                </p>
-                <div>
-                    <Link to={`/home`}>
-                        <button className={ styles.button }>HOME</button>
-                    </Link>
-                </div>
             </div>
         </div>
     );
-}
+};
 
 export default Detail;
